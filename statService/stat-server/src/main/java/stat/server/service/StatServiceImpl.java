@@ -12,15 +12,14 @@ import stat.server.repository.StatRepository;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.ZoneOffset;
 import java.util.*;
 
 @Service
 @RequiredArgsConstructor
 public class StatServiceImpl implements StatService {
 
-    final private StatRepository statRepository;
-    final private HitMapper hitMapper;
+    final StatRepository statRepository;
+    final HitMapper hitMapper;
     private static final LocalDateTime MIN_DATE = LocalDateTime.of(2020, 1, 1, 0, 0);
 
     @Override
@@ -76,10 +75,10 @@ public class StatServiceImpl implements StatService {
         }
         List<HitDtoStatResponse> stats = new ArrayList<>();
 
-        for(Map.Entry<String, Map<String, Long>> appEntry : normalHits.entrySet()) {
+        for (Map.Entry<String, Map<String, Long>> appEntry : normalHits.entrySet()) {
             String app = appEntry.getKey();
             Map<String, Long> uriMap = appEntry.getValue();
-            for(Map.Entry<String, Long> uriEntry : uriMap.entrySet()) {
+            for (Map.Entry<String, Long> uriEntry : uriMap.entrySet()) {
                 String uri = uriEntry.getKey();
                 Long statCount = uriEntry.getValue();
 

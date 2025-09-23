@@ -8,7 +8,7 @@ import java.time.Instant;
 @Component
 public class HitMapper {
 
-    public Hit dtoRequestToModel (HitDtoRequest hitDtoRequest, Instant dateTime){
+    public Hit dtoRequestToModel(HitDtoRequest hitDtoRequest, Instant dateTime) {
         return new Hit(hitDtoRequest.getId(),
                 hitDtoRequest.getApp(),
                 hitDtoRequest.getUri(),
