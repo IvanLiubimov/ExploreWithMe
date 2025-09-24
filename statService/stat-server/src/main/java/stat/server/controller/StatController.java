@@ -14,7 +14,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -32,14 +31,11 @@ public class StatController {
     }
 
     @GetMapping(path = "/stats")
-    public ResponseEntity<Collection<HitDtoStatResponse>> getHits(
-            @RequestParam String start,
-            @RequestParam String end,
-            @RequestParam(required = false) List<String> uris,
-            @RequestParam(defaultValue = "false") boolean unique) {
-
+    public ResponseEntity<Collection<HitDtoStatResponse>> getHits(@RequestParam String start,
+                                                                  @RequestParam String end,
+                                                                  @RequestParam (required = false) List<String> uris,
+                                                                  @RequestParam (defaultValue = "false") boolean unique) {
         log.info("получен запрос на получение данных запроса");
-
         String decodedStart = URLDecoder.decode(start, StandardCharsets.UTF_8);
         String decodedEnd = URLDecoder.decode(end, StandardCharsets.UTF_8);
 
@@ -47,12 +43,14 @@ public class StatController {
         LocalDateTime startDateTime = LocalDateTime.parse(decodedStart, formatter);
         LocalDateTime endDateTime = LocalDateTime.parse(decodedEnd, formatter);
 
-        if (uris == null) {
-            uris = Collections.emptyList();
-        }
-
-        Collection<HitDtoStatResponse> result = statService.getHits(startDateTime, endDateTime, uris, unique);
+        Collection<HitDtoStatResponse> result = statService.getHits(
+                startDateTime,
+                endDateTime,
+                uris != null ? uris : List.of(),
+                unique
+        );
 
         return ResponseEntity.ok(result);
     }
+
 }

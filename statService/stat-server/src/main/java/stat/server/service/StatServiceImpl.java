@@ -39,7 +39,9 @@ public class StatServiceImpl implements StatService {
         Instant startInstant = toInstant(start);
         Instant endInstant = toInstant(end);
 
-        Collection<Hit> listOfHits = statRepository.getStats(startInstant, endInstant, uris); //пришедшие хиты из репозиторя
+        Collection<Hit> listOfHits = uris.isEmpty()
+                ? statRepository.getStats(startInstant, endInstant)
+                : statRepository.getStatsByUris(startInstant, endInstant, uris); //пришедшие хиты из репозиторя
 
         Map<String, Map<String, Set<String>>> uniqueHits = new HashMap<>(); //мапа для хранения полей хитов
 
@@ -63,7 +65,7 @@ public class StatServiceImpl implements StatService {
                     stats.add(hitDtoStatResponse);
                 }
             }
-
+            stats.sort((h1, h2) -> Long.compare(h2.getHits(), h1.getHits()));
             return stats;
         }
         Map<String, Map<String, Long>> normalHits = new HashMap<>();
@@ -85,6 +87,7 @@ public class StatServiceImpl implements StatService {
                 stats.add(new HitDtoStatResponse(app, uri, statCount));
             }
         }
+        stats.sort((h1, h2) -> Long.compare(h2.getHits(), h1.getHits()));
         return stats;
     }
 
@@ -100,18 +103,11 @@ public class StatServiceImpl implements StatService {
             if (start.isAfter(end)) {
                 throw new IllegalArgumentException("Дата начала должна быть раньше даты окончания");
             }
-
-            if (uris == null || uris.isEmpty()) {
-                throw new IllegalArgumentException("Список URI не может быть пустым или null");
-            }
         }
 
     private void saveValidate(HitDtoRequest hitDtoRequest) {
         if (hitDtoRequest.getApp() == null || hitDtoRequest.getApp().isBlank()) {
             throw new IllegalArgumentException("App не может быть null или пустым");
-        }
-        if (hitDtoRequest.getUri() == null || hitDtoRequest.getUri().isBlank()) {
-            throw new IllegalArgumentException("uri не может быть null или пустым");
         }
         if (hitDtoRequest.getIp() == null || hitDtoRequest.getIp().isBlank()) {
             throw new IllegalArgumentException("ip не может быть null или пустым");
