@@ -33,7 +33,7 @@ public class StatController {
     @GetMapping(path = "/stats")
     public ResponseEntity<Collection<HitDtoStatResponse>> getHits(@RequestParam String start,
                                                                   @RequestParam String end,
-                                                                  @RequestParam List<String> uris,
+                                                                  @RequestParam (required = false) List<String> uris,
                                                                   @RequestParam (defaultValue = "false") boolean unique) {
         log.info("получен запрос на получение данных запроса");
         String decodedStart = URLDecoder.decode(start, StandardCharsets.UTF_8);
@@ -43,8 +43,12 @@ public class StatController {
         LocalDateTime startDateTime = LocalDateTime.parse(decodedStart, formatter);
         LocalDateTime endDateTime = LocalDateTime.parse(decodedEnd, formatter);
 
-        // передаём в сервис уже нормальные объекты
-        Collection<HitDtoStatResponse> result = statService.getHits(startDateTime, endDateTime, uris, unique);
+        Collection<HitDtoStatResponse> result = statService.getHits(
+                startDateTime,
+                endDateTime,
+                uris != null ? uris : List.of(),
+                unique
+        );
 
         return ResponseEntity.ok(result);
     }
