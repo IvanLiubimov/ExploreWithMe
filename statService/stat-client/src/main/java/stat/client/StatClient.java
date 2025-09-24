@@ -3,18 +3,22 @@ package stat.client;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import stat.dto.HitDtoRequest;
 import stat.dto.HitDtoStatResponse;
 
 import java.util.List;
 
-public class  StatClient {
-    private final String serverUrl;
-    private final RestTemplate restTemplate = new RestTemplate();
+@Component
+public class StatClient {
 
-    public StatClient(String serverUrl) {
-        this.serverUrl = serverUrl;
+    private final String serverUrl;
+    private final RestTemplate restTemplate;
+
+    public StatClient(StatClientConfig config, RestTemplate restTemplate) {
+        this.serverUrl = config.getUrl();
+        this.restTemplate = restTemplate;
     }
 
     public void saveHit(HitDtoRequest hit) {
@@ -22,17 +26,17 @@ public class  StatClient {
     }
 
     public List<HitDtoStatResponse> getStats(String start, String end, List<String> uris, boolean unique) {
-        String uri = serverUrl + "/stats?start=" + start + "&end=" + end + "&unique=" + unique;
+        StringBuilder uri = new StringBuilder(serverUrl + "/stats?start=" + start + "&end=" + end + "&unique=" + unique);
         for (String u : uris) {
-            uri += "&uris=" + u;
+            uri.append("&uris=").append(u);
         }
+
         ResponseEntity<List<HitDtoStatResponse>> response = restTemplate.exchange(
-                uri,
+                uri.toString(),
                 HttpMethod.GET,
                 null,
-                new ParameterizedTypeReference<List<HitDtoStatResponse>>() {}
+                new ParameterizedTypeReference<>() {}
         );
         return response.getBody();
     }
-
 }
