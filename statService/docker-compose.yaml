@@ -1,0 +1,28 @@
+version: "3.9"
+services:
+  postgres:
+    image: postgres:15
+    container_name: stat_postgres
+    environment:
+      POSTGRES_DB: statsdb
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  stat-server:
+    build: ./stat-server
+    container_name: stat_server
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/statsdb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    ports:
+      - "9090:9090"
+    depends_on:
+      - postgres
+
+volumes:
+  postgres_data:
