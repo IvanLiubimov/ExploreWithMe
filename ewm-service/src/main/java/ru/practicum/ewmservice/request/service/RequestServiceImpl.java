@@ -19,14 +19,10 @@ import ru.practicum.ewmservice.request.repository.RequestRepository;
 import ru.practicum.ewmservice.user.model.User;
 import ru.practicum.ewmservice.user.repository.UserRepository;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,7 +43,6 @@ public class RequestServiceImpl implements RequestService {
 
         validate(user, event);
         RequestStatus status;
-        //long confirmedRequests = requestRepository.countByEventIdAndStatus(event.getId(), RequestStatus.CONFIRMED);
         if (event.getParticipantLimit() == 0) {
             status = RequestStatus.CONFIRMED;
         } else {
@@ -68,7 +63,7 @@ public class RequestServiceImpl implements RequestService {
         List<Request> requests = requestRepository.findAllByRequesterId(userId);
 
         return requests.stream()
-                .map(requestMapper::toDto) // toDto теперь форматирует LocalDateTime
+                .map(requestMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -91,62 +86,69 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     @Transactional
-    public RequestDtoForUpdResponse editUserRequestsStatusOfEvent(Long userId, Long eventId, ParticipationRequestDtoUpd updateRequest) {
+    public RequestDtoForUpdResponse editUserRequestsStatusOfEvent(
+            Long userId,
+            Long eventId,
+            ParticipationRequestDtoUpd updateRequest
+    ) {
         getUserIfExists(userId);
         Event event = getEventIfExists(eventId);
+
         if (!event.getInitiator().getId().equals(userId)) {
             throw new NotFoundException("Пользователь с id=" + userId + " не является инициатором события с id=" + eventId);
         }
+
         if (!event.getRequestModeration() || event.getParticipantLimit() == 0) {
             throw new ConflictException("Подтверждение заявок не требуется для этого события");
         }
 
-        long confirmedCount = requestRepository.countByEventIdAndStatus(eventId, RequestStatus.CONFIRMED);
-        if (updateRequest != null && updateRequest.getStatus() == RequestStatus.CONFIRMED &&
-                event.getParticipantLimit() > 0 &&
-                confirmedCount >= event.getParticipantLimit()) {
-            throw new ConflictException("Попытка принять заявку на участие в событии, когда лимит уже достигнут");
+        Long confirmedRequests = requestRepository.countByEventIdAndStatus(event.getId(), RequestStatus.CONFIRMED);
+        if (event.getParticipantLimit() > 0 && confirmedRequests >= event.getParticipantLimit()) {
+            throw new ConflictException("Достигнут лимит участников события");
         }
-        List<Request> requests;
-        if (updateRequest == null || updateRequest.getIds() == null || updateRequest.getIds().isEmpty()) {
-            requests = requestRepository.findAllByEventId(eventId).stream()
-                    .filter(r -> r.getStatus() == RequestStatus.PENDING)
-                    .toList();
-        } else {
-            requests = updateRequest.getIds().stream()
-                    .map(this::getRequestIfExists)
-                    .filter(r -> r.getStatus() == RequestStatus.PENDING)
-                    .toList();
+
+        List<Request> requests = requestRepository.findByIdIn(updateRequest.getRequestIds());
+
+        if (requests.size() != updateRequest.getRequestIds().size()) {
+            throw new NotFoundException("Некоторые заявки не найдены");
         }
-        if (requests.isEmpty()) {
-            if (updateRequest != null && updateRequest.getStatus() == RequestStatus.CONFIRMED) {
-                throw new ConflictException("Попытка принять заявку на участие в событии, когда лимит уже достигнут или заявки уже обработаны");
-            }
-            if (updateRequest != null && updateRequest.getStatus() == RequestStatus.REJECTED) {
-                throw new ConflictException("Попытка отклонить уже обработанные заявки");
+
+        for (Request request : requests) {
+            if (!request.getEvent().getId().equals(eventId)) {
+                throw new ConditionsNotMetException("Заявка с id=" + request.getId() + " не принадлежит событию с id=" + eventId);
             }
         }
 
-        for (Request r : requests) {
-            if (r.getStatus() != RequestStatus.PENDING) {
+        List<ParticipationRequestDto> confirmed = new ArrayList<>();
+        List<ParticipationRequestDto> rejected = new ArrayList<>();
+
+        for (Request request : requests) {
+            if (!request.getStatus().equals(RequestStatus.PENDING)) {
                 throw new ConflictException("Статус можно изменить только у заявок в состоянии ожидания");
             }
 
             if (updateRequest.getStatus() == RequestStatus.CONFIRMED) {
-                if (event.getParticipantLimit() > 0 && confirmedCount >= event.getParticipantLimit()) {
-                    throw new ConflictException("Попытка принять заявку на участие в событии, когда лимит уже достигнут");
+                if (confirmedRequests < event.getParticipantLimit()) {
+                    request.setStatus(RequestStatus.CONFIRMED);
+                    confirmedRequests++;
+                    confirmed.add(requestMapper.toDto(request));
+                } else {
+                    request.setStatus(RequestStatus.REJECTED);
+                    rejected.add(requestMapper.toDto(request));
                 }
-                r.setStatus(RequestStatus.CONFIRMED);
-                confirmedCount++;
-            } else if (updateRequest.getStatus() == RequestStatus.REJECTED) {
-                r.setStatus(RequestStatus.REJECTED);
+            } else {
+                request.setStatus(RequestStatus.REJECTED);
+                rejected.add(requestMapper.toDto(request));
             }
         }
 
-        List<Request> savedRequests = requestRepository.saveAll(requests);
-        return requestMapper.toDtoForUpdResponse(savedRequests);
-    }
+        requestRepository.saveAll(requests);
 
+        return RequestDtoForUpdResponse.builder()
+                .confirmedRequests(confirmed)
+                .rejectedRequests(rejected)
+                .build();
+    }
 
     @Override
     public ParticipationRequestDto cancelUserRequest(Long userId, Long requestId) {

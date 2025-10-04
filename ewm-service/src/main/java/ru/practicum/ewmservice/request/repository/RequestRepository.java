@@ -7,7 +7,6 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.ewmservice.request.model.Request;
 import ru.practicum.ewmservice.request.model.RequestStatus;
 
-import java.util.Collection;
 import java.util.List;
 
 @Repository
@@ -15,7 +14,7 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
 
     @Query("SELECT r FROM Request r " +
             "WHERE r.event.id = :eventId")
-    Collection<Request> findAllByEventId(@Param("eventId") Long eventId);
+    List<Request> findAllByEventId(@Param("eventId") Long eventId);
 
     @Query("SELECT COUNT(r) FROM Request r " +
             "WHERE r.event.id = :eventId " +
@@ -23,10 +22,14 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     Long countByEventIdAndStatus(@Param("eventId") Long eventId,
                                  @Param("status") RequestStatus requestStatus);
 
+
     boolean existsByRequesterIdAndEventId(Long requesterId, Long eventId);
 
     long countByEventIdAndStatusIn(Long eventId, List<RequestStatus> statuses);
 
     List<Request> findAllByRequesterId(Long requesterId);
+
+    List<Request> findByIdIn (List<Long> ids);
+
 
 }

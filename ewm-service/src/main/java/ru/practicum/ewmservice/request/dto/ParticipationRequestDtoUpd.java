@@ -13,6 +13,6 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 public class ParticipationRequestDtoUpd {
-    private List<Long> ids;
+    private List<Long> requestIds;
     private RequestStatus status;
 }

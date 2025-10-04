@@ -21,4 +21,6 @@ public interface RequestService {
 
     ParticipationRequestDto cancelUserRequest(Long userId, Long requestId);
 
+
+
 }
