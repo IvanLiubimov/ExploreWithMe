@@ -1,33 +1,18 @@
-version: "3.9"
-
 services:
-  stats-db:
-    image: postgres:15
-    container_name: stats_postgres
+  stat_postgres:
+    image: postgres:15-alpine
+    container_name: stat_postgres
     environment:
-      POSTGRES_DB: statsdb
+      POSTGRES_DB: statdb
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
       - "5432:5432"
     volumes:
-      - stats_data:/var/lib/postgresql/data
+      - stat_postgres_data:/var/lib/postgresql/data
 
-  stats-server:
-    build: ./statService/stat-server
-    container_name: stat_server
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/statsdb
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      SERVER_PORT: 9090
-    ports:
-      - "9090:9090"
-    depends_on:
-      - stats-db
-
-  ewm-db:
-    image: postgres:16.1
+  ewm_postgres:
+    image: postgres:16-alpine
     container_name: ewm_postgres
     environment:
       POSTGRES_DB: ewmdb
@@ -36,23 +21,39 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - ewm_data:/var/lib/postgresql/data
+      - ewm_postgres_data:/var/lib/postgresql/data
 
-  ewm-service:
-    build: ./ewm-service
+  ewm_service:
+    build:
+      context: ./ewm-service
+      dockerfile: Dockerfile
     container_name: ewm_service
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://ewm-db:5432/ewmdb
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      WAIT_FOR_HOST: stats-server
-      WAIT_FOR_PORT: 9090
     ports:
       - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://ewm_postgres:5432/ewmdb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+      STAT_SERVER_URL: http://statserver:9090
     depends_on:
-      - ewm-db
-      - stats-server
+      - ewm_postgres
+      - stat_server
+
+  stat_server:
+    build:
+      context: ./statService/stat-server
+      dockerfile: Dockerfile
+    container_name: statserver
+    ports:
+      - "9090:9090"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stat_postgres:5432/statdb
+      SPRING_DATASOURCE_USERNAME: user
+      SPRING_DATASOURCE_PASSWORD: password
+    depends_on:
+      - stat_postgres
+
 
 volumes:
-  stats_data:
-  ewm_data:
+  stat_postgres_data:
+  ewm_postgres_data:

@@ -8,6 +8,8 @@ import org.springframework.web.client.RestTemplate;
 import stat.dto.HitDtoRequest;
 import stat.dto.HitDtoStatResponse;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Component
@@ -38,5 +40,18 @@ public class StatClient {
                 new ParameterizedTypeReference<>() {}
         );
         return response.getBody();
+    }
+
+    public long getViews(Long eventId) {
+        String start = "2021-01-01 00:00:00";
+        String end = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        List<String> uris = List.of("/events/" + eventId);
+
+        List<HitDtoStatResponse> stats = getStats(start, end, uris, false);
+
+        if (stats != null && !stats.isEmpty()) {
+            return stats.get(0).getHits();
+        }
+        return 0L;
     }
 }
