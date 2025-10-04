@@ -6,7 +6,6 @@ import ru.practicum.ewmservice.category.model.Category;
 import ru.practicum.ewmservice.events.model.Event;
 import ru.practicum.ewmservice.events.model.Location;
 import ru.practicum.ewmservice.events.model.State;
-import ru.practicum.ewmservice.events.model.StateAction;
 import ru.practicum.ewmservice.user.dto.UserShortDto;
 import ru.practicum.ewmservice.user.model.User;
 
@@ -132,7 +131,6 @@ public class EventMapper {
                 }
             }
         }
-
     }
 
     public Event adminUpdateEventFromDto(Event oldEvent, UpdateEventAdminRequest eventUpd, Category category) {
@@ -178,7 +176,6 @@ public class EventMapper {
                 case REJECT_EVENT -> oldEvent.setState(State.CANCELED);
             }
         }
-
         return oldEvent;
     }
 

@@ -3,7 +3,6 @@ package ru.practicum.ewmservice.events.service;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import ru.practicum.ewmservice.events.dto.*;
-import ru.practicum.ewmservice.events.model.Event;
 import ru.practicum.ewmservice.events.model.State;
 
 import java.util.Collection;

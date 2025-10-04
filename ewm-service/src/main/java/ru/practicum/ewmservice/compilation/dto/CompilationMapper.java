@@ -5,7 +5,6 @@ import org.springframework.stereotype.Component;
 import ru.practicum.ewmservice.category.dto.CategoryMapper;
 import ru.practicum.ewmservice.compilation.model.Compilation;
 import ru.practicum.ewmservice.events.dto.EventMapper;
-import ru.practicum.ewmservice.events.dto.EventShortDto;
 import ru.practicum.ewmservice.events.model.Event;
 import ru.practicum.ewmservice.user.dto.UserMapper;
 

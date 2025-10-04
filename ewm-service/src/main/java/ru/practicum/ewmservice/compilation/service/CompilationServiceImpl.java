@@ -1,20 +1,16 @@
 package ru.practicum.ewmservice.compilation.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ru.practicum.ewmservice.category.dto.CategoryMapper;
 import ru.practicum.ewmservice.compilation.dto.CompilationDto;
 import ru.practicum.ewmservice.compilation.dto.NewCompilationDto;
 import ru.practicum.ewmservice.compilation.dto.UpdateCompilationRequest;
 import ru.practicum.ewmservice.compilation.dto.CompilationMapper;
 import ru.practicum.ewmservice.compilation.model.Compilation;
 import ru.practicum.ewmservice.compilation.repository.CompilationRepository;
-import ru.practicum.ewmservice.events.dto.EventMapper;
-import ru.practicum.ewmservice.events.dto.EventShortDto;
 import ru.practicum.ewmservice.events.model.Event;
 import ru.practicum.ewmservice.events.repository.EventRepository;
 import ru.practicum.ewmservice.exception.ConditionsNotMetException;
@@ -22,7 +18,6 @@ import ru.practicum.ewmservice.exception.NotFoundException;
 import ru.practicum.ewmservice.request.model.RequestStatus;
 import ru.practicum.ewmservice.request.repository.RequestRepository;
 import ru.practicum.ewmservice.stat.client.StatClientEwm;
-import ru.practicum.ewmservice.user.dto.UserMapper;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -34,8 +29,8 @@ public class CompilationServiceImpl implements CompilationService {
     private final CompilationRepository compilationRepository;
     private final EventRepository eventRepository;
     private final CompilationMapper compilationMapper;
-    private final StatClientEwm statsClientEwm; // клиент для статистики
-    private final RequestRepository requestRepository; // для confirmedRequests
+    private final StatClientEwm statsClientEwm;
+    private final RequestRepository requestRepository;
 
     @Override
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
@@ -167,6 +162,4 @@ public class CompilationServiceImpl implements CompilationService {
             }
         }
     }
-
-
 }

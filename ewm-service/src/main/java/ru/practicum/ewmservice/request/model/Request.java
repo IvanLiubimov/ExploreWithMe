@@ -8,7 +8,6 @@ import lombok.Setter;
 import ru.practicum.ewmservice.events.model.Event;
 import ru.practicum.ewmservice.user.model.User;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity

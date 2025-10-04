@@ -8,7 +8,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import ru.practicum.ewmservice.events.model.Location;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Data

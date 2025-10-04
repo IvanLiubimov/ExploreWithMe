@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.user.dto.UserDto;
 import ru.practicum.ewmservice.user.service.UserService;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 

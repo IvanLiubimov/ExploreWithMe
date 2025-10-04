@@ -7,7 +7,6 @@ import lombok.Setter;
 import ru.practicum.ewmservice.category.dto.CategoryDto;
 import ru.practicum.ewmservice.user.dto.UserShortDto;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Getter

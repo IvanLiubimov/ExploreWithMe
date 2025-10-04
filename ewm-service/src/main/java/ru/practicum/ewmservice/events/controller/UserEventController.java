@@ -6,17 +6,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.ewmservice.events.dto.*;
-import ru.practicum.ewmservice.events.model.Event;
-import ru.practicum.ewmservice.events.model.StateAction;
 import ru.practicum.ewmservice.events.service.EventService;
-import ru.practicum.ewmservice.exception.ConditionsNotMetException;
 import ru.practicum.ewmservice.request.dto.ParticipationRequestDto;
 import ru.practicum.ewmservice.request.dto.ParticipationRequestDtoUpd;
 import ru.practicum.ewmservice.request.dto.RequestDtoForUpdResponse;
 import ru.practicum.ewmservice.request.service.RequestService;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 @RestController
