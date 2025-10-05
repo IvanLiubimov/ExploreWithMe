@@ -211,7 +211,7 @@ public class EventServiceImpl implements EventService {
         );
         statClientEwm.saveHit(hitDto);
 
-        long views = statClientEwm.getViews(event.getId());
+        long views = statClientEwm.hitAndGetViews(event.getId(), request.getRemoteAddr());
 
         CategoryDto categoryDto = categoryMapper.toDto(event.getCategory());
         UserShortDto initiatorDto = userMapper.toShortDto(event.getInitiator());
