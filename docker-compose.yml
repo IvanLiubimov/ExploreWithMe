@@ -43,7 +43,7 @@ services:
     build:
       context: ./statService/stat-server
       dockerfile: Dockerfile
-    container_name: stats-server
+    container_name: statserver
     ports:
       - "9090:9090"
     environment:

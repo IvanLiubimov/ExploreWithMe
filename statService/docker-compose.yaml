@@ -12,7 +12,7 @@ services:
     volumes:
       - stats_data:/var/lib/postgresql/data
 
-  stats-server:
+  stat-server:
     build: ./stat-server
     container_name: stat_server
     environment:
