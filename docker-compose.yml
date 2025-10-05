@@ -34,7 +34,7 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://ewm_postgres:5432/ewmdb
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
-      STAT_SERVER_URL: http://statserver:9090
+      STAT_SERVER_URL: http://statsserver:9090
     depends_on:
       - ewm_postgres
       - stat_server
@@ -43,7 +43,7 @@ services:
     build:
       context: ./statService/stat-server
       dockerfile: Dockerfile
-    container_name: statserver
+    container_name: statsserver
     ports:
       - "9090:9090"
     environment:
