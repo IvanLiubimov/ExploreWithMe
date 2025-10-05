@@ -37,9 +37,9 @@ services:
       STAT_SERVER_URL: http://statserver:9090
     depends_on:
       - ewm_postgres
-      - stat-server
+      - stats-server
 
-  stat-server:
+  stats-server:
     build:
       context: ./statService/stat-server
       dockerfile: Dockerfile
