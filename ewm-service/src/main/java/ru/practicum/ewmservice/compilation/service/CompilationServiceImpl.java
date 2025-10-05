@@ -126,7 +126,7 @@ public class CompilationServiceImpl implements CompilationService {
         Map<Long, Long> views = events.stream()
                 .collect(Collectors.toMap(
                         Event::getId,
-                        e -> statsClientEwm.getViews(e.getId())
+                        e -> statsClientEwm.getViews(e.getId(), true)
                 ));
 
         return compilationMapper.toDto(compilation, confirmedRequests, views);

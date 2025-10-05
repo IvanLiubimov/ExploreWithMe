@@ -41,9 +41,9 @@ public class StatServiceImpl implements StatService {
 
         Collection<Hit> listOfHits = uris.isEmpty()
                 ? statRepository.getStats(startInstant, endInstant)
-                : statRepository.getStatsByUris(startInstant, endInstant, uris); //пришедшие хиты из репозиторя
+                : statRepository.getStatsByUris(startInstant, endInstant, uris);
 
-        Map<String, Map<String, Set<String>>> uniqueHits = new HashMap<>(); //мапа для хранения полей хитов
+        Map<String, Map<String, Set<String>>> uniqueHits = new HashMap<>();
 
         if (unique) {
             for (Hit hit : listOfHits) {

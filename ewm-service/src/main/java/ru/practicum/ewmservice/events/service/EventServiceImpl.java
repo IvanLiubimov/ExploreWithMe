@@ -106,7 +106,7 @@ public class EventServiceImpl implements EventService {
         Map<Long, Long> viewsMap = events.stream()
                 .collect(Collectors.toMap(
                         Event::getId,
-                        e -> statClientEwm.getViews(e.getId())
+                        e -> statClientEwm.getViews(e.getId(), true)
                 ));
 
         return events.stream()
@@ -115,10 +115,9 @@ public class EventServiceImpl implements EventService {
                     UserShortDto initiatorDto = userMapper.toShortDto(event.getInitiator());
                     State state = event.getState();
 
-                    EventDtoFull dto = eventMapper.toFullEventDto(event, categoryDto, initiatorDto, state)
+                    EventDtoFull dto = eventMapper.toFullEventDto(event, categoryDto, initiatorDto, state, event.getViews())
                             .toBuilder()
                             .confirmedRequests(confirmedRequestsMap.getOrDefault(event.getId(), 0))
-                            .views(viewsMap.getOrDefault(event.getId(), 0L))
                             .build();
 
                     return dto;
@@ -145,7 +144,8 @@ public class EventServiceImpl implements EventService {
                 saved,
                 category != null ? categoryMapper.toDto(category) : categoryMapper.toDto(saved.getCategory()),
                 userMapper.toShortDto(saved.getInitiator()),
-                saved.getState()
+                saved.getState(),
+                updatedEvent.getViews()
         );
     }
 
@@ -180,6 +180,12 @@ public class EventServiceImpl implements EventService {
 
         statClientEwm.saveHit(hitDto);
 
+        try {
+            Thread.sleep(200); // ждём 200 миллисекунд
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         return events.stream()
                 .map(event -> {
                     CategoryDto categoryDto = categoryMapper.toDto(event.getCategory());
@@ -188,12 +194,12 @@ public class EventServiceImpl implements EventService {
 
                     int confirmedRequests = requestRepository.countByEventIdAndStatus(event.getId(), RequestStatus.CONFIRMED).intValue();
 
-                    long views = statClientEwm.getViews(event.getId());
+                    long views = statClientEwm.getViews(event.getId(),true);
 
-                    return eventMapper.toFullEventDto(event, categoryDto, initiatorDto, state)
+
+                    return eventMapper.toFullEventDto(event, categoryDto, initiatorDto, state, views)
                             .toBuilder()
                             .confirmedRequests(confirmedRequests)
-                            .views(views)
                             .build();
                 }).toList();
     }
@@ -211,14 +217,20 @@ public class EventServiceImpl implements EventService {
         );
         statClientEwm.saveHit(hitDto);
 
-        long views = statClientEwm.hitAndGetViews(event.getId(), request.getRemoteAddr());
+        try {
+            Thread.sleep(200); // ждём 200 миллисекунд
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        long views = statClientEwm.getViews(eventId, true);
+
+        //long views = statClientEwm.hitAndGetViews(event.getId(), request.getRemoteAddr());
 
         CategoryDto categoryDto = categoryMapper.toDto(event.getCategory());
         UserShortDto initiatorDto = userMapper.toShortDto(event.getInitiator());
 
-        return eventMapper.toFullEventDto(event, categoryDto, initiatorDto, event.getState())
+        return eventMapper.toFullEventDto(event, categoryDto, initiatorDto, event.getState(), views)
                 .toBuilder()
-                .views(views)
                 .build();
     }
 
@@ -228,18 +240,16 @@ public class EventServiceImpl implements EventService {
 
         List<Event> events = eventRepository.findAllByInitiatorId(userId, pageRequest);
 
-
         Map<Long, Long> confirmedRequests = events.stream()
                 .collect(Collectors.toMap(
                         Event::getId,
                         e -> requestRepository.countByEventIdAndStatus(e.getId(), RequestStatus.CONFIRMED)
                 ));
 
-        // Собираем views
         Map<Long, Long> views = events.stream()
                 .collect(Collectors.toMap(
                         Event::getId,
-                        e -> statClientEwm.getViews(e.getId())
+                        e -> statClientEwm.getViews(e.getId(), true)
                 ));
 
         return events.stream()
@@ -264,7 +274,7 @@ public class EventServiceImpl implements EventService {
         CategoryDto categoryDto = categoryMapper.toDto(category);
         UserShortDto userShortDto = userMapper.toShortDto(user);
         Event savedEvent = eventRepository.save(event);
-        return eventMapper.toFullEventDto(savedEvent, categoryDto, userShortDto, State.PENDING);
+        return eventMapper.toFullEventDto(savedEvent, categoryDto, userShortDto, State.PENDING, savedEvent.getViews());
     }
 
     @Override
@@ -278,7 +288,7 @@ public class EventServiceImpl implements EventService {
         CategoryDto categoryDto = categoryMapper.toDto(event.getCategory());
         UserShortDto userShortDto = userMapper.toShortDto(event.getInitiator());
 
-        return eventMapper.toFullEventDto(event, categoryDto, userShortDto, event.getState());
+        return eventMapper.toFullEventDto(event, categoryDto, userShortDto, event.getState(), event.getViews());
     }
 
     @Override
@@ -314,7 +324,7 @@ public class EventServiceImpl implements EventService {
         CategoryDto categoryDto = categoryMapper.toDto(updatedEvent.getCategory());
         UserShortDto userShortDto = userMapper.toShortDto(updatedEvent.getInitiator());
 
-        return eventMapper.toFullEventDto(updatedEvent, categoryDto, userShortDto, updatedEvent.getState());
+        return eventMapper.toFullEventDto(updatedEvent, categoryDto, userShortDto, updatedEvent.getState(), updatedEvent.getViews());
     }
 
     private User getUserIfExists(Long userId) {

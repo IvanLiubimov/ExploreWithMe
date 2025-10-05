@@ -1,5 +1,6 @@
 package stat.client;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +13,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+@Slf4j
 @Component
 public class StatClient {
 
@@ -24,6 +26,7 @@ public class StatClient {
     }
 
     public void saveHit(HitDtoRequest hit) {
+        log.info("Отправка HIT в статистику: {}", hit);
         restTemplate.postForEntity(serverUrl + "/hit", hit, Void.class);
     }
 
@@ -33,13 +36,20 @@ public class StatClient {
             uri.append("&uris=").append(u);
         }
 
+        String finalUrl = uri.toString();
+        log.info("Вызов статистики: {}", finalUrl);
+
         ResponseEntity<List<HitDtoStatResponse>> response = restTemplate.exchange(
                 uri.toString(),
                 HttpMethod.GET,
                 null,
                 new ParameterizedTypeReference<>() {}
         );
-        return response.getBody();
+
+        List<HitDtoStatResponse> body = response.getBody();
+        log.info("Ответ от статистики: {}", body);
+
+        return body;
     }
 
     public long getViews(Long eventId) {

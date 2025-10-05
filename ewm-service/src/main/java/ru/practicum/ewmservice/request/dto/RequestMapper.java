@@ -24,7 +24,6 @@ public class RequestMapper {
         );
     }
 
-
    public Request updateStatus(Request request, RequestStatus newStatus) {
        request.setStatus(newStatus);
        return request;

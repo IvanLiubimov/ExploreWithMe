@@ -61,7 +61,7 @@ public class EventMapper {
         return locDto;
     }
 
-    public EventDtoFull toFullEventDto(Event event, CategoryDto categoryDto, UserShortDto initiator, State state) {
+    public EventDtoFull toFullEventDto(Event event, CategoryDto categoryDto, UserShortDto initiator, State state, long views) {
         return EventDtoFull.builder()
                 .id(event.getId())
                 .title(event.getTitle())
@@ -77,7 +77,7 @@ public class EventMapper {
                 .createdOn(toLocalDateTime(event.getCreatedOn()))
                 .publishedOn(toLocalDateTime(event.getPublishedOn()))
                 .state(state.toString())
-                .views(event.getViews())
+                .views(views)
                 .confirmedRequests(event.getConfirmedRequests())
                 .build();
     }

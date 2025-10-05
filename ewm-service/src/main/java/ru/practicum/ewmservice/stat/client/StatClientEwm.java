@@ -1,22 +1,21 @@
 package ru.practicum.ewmservice.stat.client;
 
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import ru.practicum.ewmservice.stat.dto.HitDtoRequest;
 import ru.practicum.ewmservice.stat.dto.HitDtoStatResponse;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Component
+@Slf4j
 public class StatClientEwm {
 
     private final RestTemplate restTemplate;
@@ -27,50 +26,48 @@ public class StatClientEwm {
         this.statServerUrl = statServerUrl;
     }
 
-    public long hitAndGetViews(Long eventId, String ip) {
-        HitDtoRequest hit = HitDtoRequest.builder()
-                .app("ewm-service")
-                .uri("/events/" + eventId)
-                .ip(ip)
-                .timestamp(LocalDateTime.now())
-                .build();
-
-        saveHit(hit);
-        return getViews(eventId);
-    }
-
     public void saveHit(HitDtoRequest hit) {
+        log.info("Сохраняем HIT = {}, {}, {}, {}", hit.app(), hit.ip(), hit.uri(), hit.timestamp());
         restTemplate.postForEntity(statServerUrl + "/hit", hit, Void.class);
     }
 
-    public long getViews(Long eventId) {
-        try {
-            LocalDateTime start = LocalDateTime.of(2000, 1, 1, 0, 0);
-            LocalDateTime end = LocalDateTime.now();
+    public List<HitDtoStatResponse> getStats(LocalDateTime start, LocalDateTime end, List<String> uris, Boolean unique) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-            String startParam = URLEncoder.encode(start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), StandardCharsets.UTF_8);
-            String endParam = URLEncoder.encode(end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), StandardCharsets.UTF_8);
-            String uriParam = URLEncoder.encode("/events/" + eventId, StandardCharsets.UTF_8);
+        StringBuilder url = new StringBuilder(statServerUrl + "/stats?start={start}&end={end}");
 
-            String url = String.format("%s/stats?start=%s&end=%s&unique=true&uris=%s",
-                    statServerUrl, startParam, endParam, uriParam);
+        Map<String, Object> params = new HashMap<>();
+        params.put("start", start.format(formatter));
+        params.put("end", end.format(formatter));
 
-            ResponseEntity<List<HitDtoStatResponse>> response = restTemplate.exchange(
-                    url,
-                    HttpMethod.GET,
-                    null,
-                    new ParameterizedTypeReference<>() {}
-            );
-
-            List<HitDtoStatResponse> stats = response.getBody();
-            if (stats != null && !stats.isEmpty()) {
-                return stats.get(0).hits();
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
+        if (uris != null && !uris.isEmpty()) {
+            url.append("&uris={uris}");
+            params.put("uris", String.join(",", uris));
+        }
+        if (unique != null) {
+            url.append("&unique={unique}");
+            params.put("unique", unique.toString());
         }
 
-        return 0L;
+        ResponseEntity<HitDtoStatResponse[]> response = restTemplate.getForEntity(
+                url.toString(),
+                HitDtoStatResponse[].class,
+                params
+        );
+
+        HitDtoStatResponse[] body = response.getBody();
+        return body != null ? List.of(body) : List.of();
+    }
+
+    public long getViews(Long eventId, Boolean unique) {
+        LocalDateTime start = LocalDateTime.of(2000, 1, 1, 0, 0);
+        LocalDateTime end = LocalDateTime.now();
+
+        List<HitDtoStatResponse> stats = getStats(start, end, List.of("/events/" + eventId), unique);
+
+        return stats.stream()
+                .mapToLong(HitDtoStatResponse::hits)
+                .sum();
     }
 }
+
