@@ -420,8 +420,6 @@ public class EventServiceImpl implements EventService {
         }
     }
 
-
-
     private void validateForAdminEdit(UpdateEventAdminRequest event, Event oldEvent, StateAction stateAction) {
         if (event == null) return;
 
@@ -461,6 +459,4 @@ public class EventServiceImpl implements EventService {
             throw new ConflictException("Опубликованное событие нельзя отклонить");
         }
     }
-
-
 }

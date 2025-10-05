@@ -94,6 +94,10 @@ public class RequestServiceImpl implements RequestService {
         getUserIfExists(userId);
         Event event = getEventIfExists(eventId);
 
+        if (updateRequest == null || updateRequest.getRequestIds() == null) {
+            throw new ConflictException("Запрос не содержит requestIds");
+        }
+
         if (!event.getInitiator().getId().equals(userId)) {
             throw new NotFoundException("Пользователь с id=" + userId + " не является инициатором события с id=" + eventId);
         }

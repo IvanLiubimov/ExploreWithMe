@@ -9,6 +9,8 @@ import org.springframework.web.client.RestTemplate;
 import ru.practicum.ewmservice.stat.dto.HitDtoRequest;
 import ru.practicum.ewmservice.stat.dto.HitDtoStatResponse;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -29,8 +31,8 @@ public class StatClientEwm {
     }
 
     public long getViews(Long eventId) {
-        String start = "2000-01-01 00:00:00";
-        String end = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+        String start = URLEncoder.encode("2000-01-01 00:00:00", StandardCharsets.UTF_8);
+        String end = URLEncoder.encode(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")), StandardCharsets.UTF_8);
         String uri = "/events/" + eventId;
 
         String url = String.format("%s/stats?start=%s&end=%s&unique=true&uris=%s",
