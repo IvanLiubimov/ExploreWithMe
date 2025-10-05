@@ -37,13 +37,13 @@ services:
       STAT_SERVER_URL: http://statserver:9090
     depends_on:
       - ewm_postgres
-      - stat_server
+      - stat-server
 
-  stat_server:
+  stat-server:
     build:
       context: ./statService/stat-server
       dockerfile: Dockerfile
-    container_name: statserver
+    container_name: stats-server
     ports:
       - "9090:9090"
     environment:
