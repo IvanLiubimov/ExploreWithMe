@@ -34,7 +34,7 @@ public class CompilationServiceImpl implements CompilationService {
 
     @Override
     public CompilationDto createCompilation(NewCompilationDto newCompilationDto) {
-        validateNewCompilationRequest(newCompilationDto.getTitle(), newCompilationDto.getEvents());
+        validateCompilationRequest(newCompilationDto.getTitle(), newCompilationDto.getEvents(), true);
 
         Set<Event> events = new HashSet<>();
         if (newCompilationDto.getEvents() != null) {
@@ -52,7 +52,7 @@ public class CompilationServiceImpl implements CompilationService {
     @Transactional
     public CompilationDto updateCompilation(Long compId, UpdateCompilationRequest updateRequest) {
         Compilation compilation = getCompilationIfExists(compId);
-        validateUpdateCompilationRequest(updateRequest.getTitle(), updateRequest.getEvents());
+        validateCompilationRequest(updateRequest.getTitle(), updateRequest.getEvents(), false);
 
         if (updateRequest.getTitle() != null) {
             compilation.setTitle(updateRequest.getTitle());
@@ -132,17 +132,17 @@ public class CompilationServiceImpl implements CompilationService {
         return compilationMapper.toDto(compilation, confirmedRequests, views);
     }
 
-    private void validateNewCompilationRequest(String title, Set<Long> eventIds) {
-        if (title == null || title.isBlank()) {
-            throw new ConditionsNotMetException("Название подборки не может быть пустым");
-        }
-        if (title.length() > 50) {
-            throw new ConditionsNotMetException("Длина имени категории должна быть не более 50 символов");
-        }
+    private void validateCompilationRequest(String title, Set<Long> eventIds, boolean isCreate) {
+        validateTitle(title, isCreate);
         validateEvents(eventIds);
     }
 
-    private void validateUpdateCompilationRequest(String title, Set<Long> eventIds) {
+    private void validateTitle(String title, boolean isCreate) {
+        if (isCreate) {
+            if (title == null || title.isBlank()) {
+                throw new ConditionsNotMetException("Название подборки не может быть пустым");
+            }
+        }
         if (title != null) {
             if (title.isBlank()) {
                 throw new ConditionsNotMetException("Название подборки не может быть пустым");
@@ -151,7 +151,6 @@ public class CompilationServiceImpl implements CompilationService {
                 throw new ConditionsNotMetException("Длина имени категории должна быть не более 50 символов");
             }
         }
-        validateEvents(eventIds);
     }
 
     private void validateEvents(Set<Long> eventIds) {
@@ -162,4 +161,5 @@ public class CompilationServiceImpl implements CompilationService {
             }
         }
     }
+
 }

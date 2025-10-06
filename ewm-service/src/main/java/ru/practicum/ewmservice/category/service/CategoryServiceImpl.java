@@ -27,8 +27,7 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public CategoryDto getCategoryById(Long catId) {
-        Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Категория с id=" + catId + " не найдена"));
+        Category category = getCategoryIfExists(catId);
         return categoryMapper.toDto(category);
     }
 
@@ -63,10 +62,9 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public CategoryDto editCategory(Long catId, CategoryDto categoryDto) {
         validateForUpdate(categoryDto);
-        Category category = categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Категория с id=" + catId + " не найдена"));
+        Category category = getCategoryIfExists(catId);
 
-        if (categoryDto.getName() != null && !categoryDto.getName().equals(category.getName())) {
+        if (categoryDto.getName() != null && !categoryDto.getName().equals(category.getName()) && !category.getName().isBlank()) {
             if (categoryRepository.existsByName(categoryDto.getName())) {
                 throw new ConflictException("Категория с именем " + categoryDto.getName() + " уже существует");
             }
@@ -89,8 +87,14 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     private void validateForUpdate(CategoryDto categoryDto) {
-        if (categoryDto.getName().length() > 50) {
+        if (categoryDto.getName() != null && categoryDto.getName().length() > 50) {
             throw new ConditionsNotMetException("Длина имени категории должна быть не более 50 символов");
         }
+    }
+
+    public Category getCategoryIfExists(Long catId) {
+        return categoryRepository.findById(catId)
+                .orElseThrow(() -> new NotFoundException("Категория с id=" + catId + " не найдена"));
+
     }
 }

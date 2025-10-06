@@ -132,8 +132,7 @@ public class EventServiceImpl implements EventService {
 
         Category category = null;
         if (event.getCategory() != null) {
-            category = categoryRepository.findById(event.getCategory())
-                    .orElseThrow(() -> new NotFoundException("Категория не найдена"));
+            category = getCategoryIfExists(event.getCategory());
         }
 
         validateForAdminEdit(event, oldEvent, event.getStateAction());
@@ -223,8 +222,6 @@ public class EventServiceImpl implements EventService {
             Thread.currentThread().interrupt();
         }
         long views = statClientEwm.getViews(eventId, true);
-
-        //long views = statClientEwm.hitAndGetViews(event.getId(), request.getRemoteAddr());
 
         CategoryDto categoryDto = categoryMapper.toDto(event.getCategory());
         UserShortDto initiatorDto = userMapper.toShortDto(event.getInitiator());
@@ -334,7 +331,7 @@ public class EventServiceImpl implements EventService {
 
     private Category getCategoryIfExists(Long catId) {
         return categoryRepository.findById(catId)
-                .orElseThrow(() -> new NotFoundException("Каиегория с id = " + catId + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Категория с id = " + catId + " не найден"));
     }
 
     private Event getEventIfExists(Long eventId) {
@@ -360,12 +357,12 @@ public class EventServiceImpl implements EventService {
             throw new ConditionsNotMetException("Аннотация события должна быть не менее 20 и не более 2000 символов");
         }
 
-        if (newEventDto.getTitle().length() < 3 || newEventDto.getTitle().length() > 120) {
-            throw new ConditionsNotMetException("Название события должно быть не менее 3 и не более 120 символов");
-        }
-
         if (newEventDto.getTitle() == null || newEventDto.getTitle().isBlank()) {
             throw new ConditionsNotMetException("Заголовок события не может быть пустым");
+        }
+
+        if (newEventDto.getTitle().length() < 3 || newEventDto.getTitle().length() > 120) {
+            throw new ConditionsNotMetException("Название события должно быть не менее 3 и не более 120 символов");
         }
 
         if (newEventDto.getEventDate() == null) {

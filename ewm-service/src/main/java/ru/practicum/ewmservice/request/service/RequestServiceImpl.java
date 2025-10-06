@@ -175,7 +175,7 @@ public class RequestServiceImpl implements RequestService {
 
     private Event getEventIfExists(Long eventId) {
         return eventRepository.findById(eventId)
-                .orElseThrow(() -> new NotFoundException("Каиегория с id = " + eventId + " не найден"));
+                .orElseThrow(() -> new NotFoundException("Категория с id = " + eventId + " не найден"));
     }
 
     private Request getRequestIfExists(Long requestId) {
