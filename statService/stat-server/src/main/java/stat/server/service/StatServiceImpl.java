@@ -20,7 +20,7 @@ public class StatServiceImpl implements StatService {
 
     final StatRepository statRepository;
     final HitMapper hitMapper;
-    private static final LocalDateTime MIN_DATE = LocalDateTime.of(2020, 1, 1, 0, 0);
+    private static final LocalDateTime MIN_DATE = LocalDateTime.of(1999, 1, 1, 0, 0);
 
     @Override
     public ResponseEntity<Object> saveHit(HitDtoRequest hitDtoRequest) {
@@ -41,9 +41,9 @@ public class StatServiceImpl implements StatService {
 
         Collection<Hit> listOfHits = uris.isEmpty()
                 ? statRepository.getStats(startInstant, endInstant)
-                : statRepository.getStatsByUris(startInstant, endInstant, uris); //пришедшие хиты из репозиторя
+                : statRepository.getStatsByUris(startInstant, endInstant, uris);
 
-        Map<String, Map<String, Set<String>>> uniqueHits = new HashMap<>(); //мапа для хранения полей хитов
+        Map<String, Map<String, Set<String>>> uniqueHits = new HashMap<>();
 
         if (unique) {
             for (Hit hit : listOfHits) {

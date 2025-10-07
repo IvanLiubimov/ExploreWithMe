@@ -1,28 +1,30 @@
-version: "3.9"
 services:
-  postgres:
-    image: postgres:15
-    container_name: stat_postgres
+  stats-db:
+    image: postgres:15-alpine
+    platform: linux/arm64
+    container_name: stats_postgres
     environment:
       POSTGRES_DB: statsdb
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
-      - "5432:5432"
+      - "5434:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - stats_data:/var/lib/postgresql/data
 
-  stat-server:
+  stats-server:
     build: ./stat-server
     container_name: stat_server
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/statsdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/statsdb
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
+      SERVER_PORT: 9090
     ports:
       - "9090:9090"
     depends_on:
-      - postgres
+      - stats-db
+    command: ["java", "-jar", "app.jar"]
 
 volumes:
-  postgres_data:
+  stats_data:

@@ -3,12 +3,12 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://ewm-db:5432/ewmdb
+    url: jdbc:postgresql://ewm_postgres:5432/ewmdb
     username: user
     password: password
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     show-sql: true
 
 management:
@@ -16,6 +16,7 @@ management:
     web:
       exposure:
         include: health, info
-  endpoint:
-    health:
-      show-details: always
+
+stat:
+  server:
+    url: ${STAT_SERVER_URL:http://statserver:9090}
