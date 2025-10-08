@@ -97,5 +97,6 @@ public class CommentServiceImpl implements CommentService {
     private Event getEventIfExists(Long eventId) {
         return eventRepository.findById(eventId)
                 .orElseThrow(() -> new NotFoundException("События с id = " + eventId + " не найдено"));
+
     }
 }
