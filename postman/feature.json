@@ -38,9 +38,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseURL}}/users/5/events/5/comments",
+					"raw": "http://localhost:8080/users/5/events/5/comments",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
 					"path": [
 						"users",
@@ -84,9 +84,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseURL}}/users/5/events/5/comments",
+					"raw": "http://localhost:8080/users/5/events/5/comments",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
 					"path": [
 						"users",
@@ -130,9 +130,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseURL}}/users/5/events/5/comments",
+					"raw": "http://localhost:8080/users/5/events/5/comments",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
 					"path": [
 						"users",
@@ -179,9 +179,9 @@
 					}
 				},
 				"url": {
-					"raw": "{{baseURL}}/users/5/comments/1",
+					"raw": "http://localhost:8080/users/5/comments/1",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
 					"path": [
 						"users",
@@ -225,7 +225,7 @@
 				"url": {
 					"raw": "{{baseURL}}/users/5/comments/1",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
 					"path": [
 						"users",
@@ -311,9 +311,9 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseURL}}/users/5/comments",
+					"raw": "http://localhost:8080/users/5/comments",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
 					"path": [
 						"users",
@@ -348,9 +348,9 @@
 				"method": "GET",
 				"header": [],
 				"url": {
-					"raw": "{{baseURL}}/events/5/comments",
+					"raw": "http://localhost:8080/events/5/comments",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
 					"path": [
 						"events",
@@ -382,9 +382,9 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{baseURL}}/users/5/comments/2",
+					"raw": "http://localhost:8080/users/5/comments/2",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
 					"path": [
 						"users",
@@ -403,8 +403,8 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Статус 403 при попытке получить чужие комментарии\", function () {",
-							"    pm.response.to.have.status(403);",
+							"pm.test(\"Статус 400 при попытке получить чужие комментарии\", function () {",
+							"    pm.response.to.have.status(400);",
 							"});"
 						],
 						"type": "text/javascript",
@@ -417,9 +417,9 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{baseURL}}/users/10/comments/1",
+					"raw": "http://localhost:8080/users/10/comments/1",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
 					"path": [
 						"users",
@@ -452,9 +452,9 @@
 				"method": "DELETE",
 				"header": [],
 				"url": {
-					"raw": "{{baseURL}}/admin/comments/1",
+					"raw": "http://localhost:8080/admin/comments/1",
 					"host": [
-						"{{baseURL}}"
+						"localhost"
 					],
 					"path": [
 						"admin",
