@@ -419,8 +419,8 @@
 					"listen": "test",
 					"script": {
 						"exec": [
-							"pm.test(\"Статус 403 при попытке получить чужие комментарии\", function () {",
-							"    pm.response.to.have.status(403);",
+							"pm.test(\"Статус 400 при попытке получить чужие комментарии\", function () {",
+							"    pm.response.to.have.status(400);",
 							"});"
 						],
 						"type": "text/javascript",
