@@ -5,6 +5,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.ewmservice.comments.dto.CommentDtoToResponse;
+import ru.practicum.ewmservice.comments.service.CommentService;
 import ru.practicum.ewmservice.events.dto.EventDtoFull;
 import ru.practicum.ewmservice.events.service.EventService;
 import ru.practicum.ewmservice.exception.ConditionsNotMetException;
@@ -19,6 +21,7 @@ import java.util.List;
 public class PublicEventController {
 
     private final EventService eventService;
+    private final CommentService commentService;
 
     @GetMapping
     public ResponseEntity<Collection<EventDtoFull>> getAllEventsPublicFilter(@RequestParam(required = false) String text,
@@ -62,5 +65,13 @@ public class PublicEventController {
 
         log.info("Public getEventById returned event title={}", event.getTitle());
         return ResponseEntity.ok(event);
+    }
+
+    @GetMapping("/{eventId}/comments")
+    public ResponseEntity<Collection<CommentDtoToResponse>> getEventComments(@PathVariable Long eventId) {
+        log.info("Получен запрос на получение комментариев события с id={} ", eventId);
+        Collection<CommentDtoToResponse> eventComments = commentService.getEventComments(eventId);
+        log.info("Комментарии события в количестве {} получены", eventComments.size());
+        return ResponseEntity.ok(eventComments);
     }
 }
