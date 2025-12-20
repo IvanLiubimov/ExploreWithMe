@@ -4,7 +4,7 @@ services:
     platform: linux/arm64
     container_name: stats_postgres
     environment:
-      POSTGRES_DB: statsdb
+      POSTGRES_DB: stats_data_base
       POSTGRES_USER: user
       POSTGRES_PASSWORD: password
     ports:
@@ -16,7 +16,7 @@ services:
     build: ./stat-server
     container_name: stat_server
     environment:
-      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/statsdb
+      SPRING_DATASOURCE_URL: jdbc:postgresql://stats-db:5432/stats_data_base
       SPRING_DATASOURCE_USERNAME: user
       SPRING_DATASOURCE_PASSWORD: password
       SERVER_PORT: 9090

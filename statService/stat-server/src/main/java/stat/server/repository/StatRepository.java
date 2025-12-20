@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.List;
 
 @Repository
-public interface StatRepository extends JpaRepository<Hit,Long> {
+public interface StatRepository extends JpaRepository<Hit, Long> {
 
     @Query("SELECT h FROM Hit h WHERE h.dateTime BETWEEN :start AND :end")
     Collection<Hit> getStats(Instant start, Instant end);
